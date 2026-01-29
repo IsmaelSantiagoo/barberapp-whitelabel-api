@@ -12,7 +12,7 @@ Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('/register-tenant', [RegisterTenantController::class, 'store']);
 
-Route::prefix('private')->middleware(['api', 'auth:sanctum', 'identify.tenant'])->group(function () {
+Route::middleware(['api', 'auth:sanctum', 'identify.tenant'])->group(function () {
     // protegidas
     Route::get('auth/me', [AuthController::class, 'me']);
     Route::get('auth/logout', [AuthController::class, 'logout']);
