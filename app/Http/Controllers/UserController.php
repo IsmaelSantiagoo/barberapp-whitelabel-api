@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menus;
-use App\Models\Usuarios;
+use App\Models\Menu;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password as RulesPassword;
 
-class UsuariosController extends Controller
+class UserController extends Controller
 {
 
     // função para alterar a senha do usuário
@@ -19,21 +19,21 @@ class UsuariosController extends Controller
 
         // configurar regras de validação
         $rules = [
-            'senha_antiga' => ['required'],
-            'senha_nova' => ['required', 'confirmed:confirmar_senha_nova', RulesPassword::default()],
-            'confirmar_senha_nova' => ['required'],
+            'old_pass' => ['required'],
+            'new_pass' => ['required', 'confirmed:confirm_new_pass', RulesPassword::default()],
+            'confirm_new_pass' => ['required'],
         ];
 
         // validação dos dados recebidos
         $validator = Validator::make($request->all(), $rules, [
-            'senha_antiga.required' => 'A senha antiga é obrigatória.',
-            'senha_antiga.password.mixed' => 'A senha deve conter letras maiúsculas, minúsculas, números e símbolos.',
+            'old_pass.required' => 'A senha antiga é obrigatória.',
+            'old_pass.password.mixed' => 'A senha deve conter letras maiúsculas, minúsculas, números e símbolos.',
 
-            'senha_nova.min' => 'A senha deve ter no mínimo :min caracteres.',
-            'senha_nova.password.mixed' => 'A senha deve conter letras maiúsculas, minúsculas, números e símbolos.',
-            'senha_nova.confirmed' => 'As senhas não coincidem.',
+            'new_pass.min' => 'A senha deve ter no mínimo :min caracteres.',
+            'new_pass.password.mixed' => 'A senha deve conter letras maiúsculas, minúsculas, números e símbolos.',
+            'new_pass.confirmed' => 'As senhas não coincidem.',
 
-            'confirmar_senha_nova.required' => 'A confirmação da senha é obrigatória.',
+            'confirm_new_pass.required' => 'A confirmação da senha é obrigatória.',
         ]);
 
         if ($validator->fails()) {
@@ -46,9 +46,9 @@ class UsuariosController extends Controller
         // lógica para alterar a senha do usuário com o ID fornecido
         try {
             // encontrar usuário pelo ID
-            $usuario = Usuarios::find($id);
+            $user = User::find($id);
 
-            if (!$usuario) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Usuário não encontrado.'
@@ -56,7 +56,7 @@ class UsuariosController extends Controller
             }
 
             // validar se a senha antiga está correta
-            if (!Hash::check($request->senha_antiga, $usuario->senha)) {
+            if (!Hash::check($request->old_pass, $user->password)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'A senha antiga está incorreta.'
@@ -64,13 +64,13 @@ class UsuariosController extends Controller
             }
 
             // alterar primeiro_acesso para false se for true
-            if ($usuario->primeiro_acesso) {
-                $usuario->primeiro_acesso = false;
+            if ($user->primeiro_acesso) {
+                $user->primeiro_acesso = false;
             }
 
             // atualizar senha do usuário
-            $usuario->senha = $request->senha_nova;
-            $usuario->save();
+            $user->password = Hash::make($request->new_pass);
+            $user->save();
 
             return response()->json([
                 'success' => true,
@@ -94,22 +94,22 @@ class UsuariosController extends Controller
         ]);
 
         // buscar usuário
-        $usuario = Usuarios::find($id);
-        if (!$usuario) {
+        $user = User::find($id);
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Usuário não encontrado.'
             ], 404);
         }
 
-        if (!$request->hasFile('imagem')) {
+        if (!$request->hasFile('image')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Nenhuma imagem foi enviada.'
             ], 400);
         }
 
-        $file = $request->file('imagem');
+        $file = $request->file('image');
 
         try {
             // salva no disco 'public' dentro da pasta images e gera nome único automaticamente
@@ -124,8 +124,8 @@ class UsuariosController extends Controller
             }
 
             // remover imagem antiga se existir e não for URL externa (como ui-avatars)
-            if ($usuario->foto_perfil && !$this->isExternalUrl($usuario->foto_perfil)) {
-                $oldPath = $this->extractStoragePath($usuario->foto_perfil);
+            if ($user->profile_photo && !$this->isExternalUrl($user->profile_photo)) {
+                $oldPath = $this->extractStoragePath($user->profile_photo);
 
                 if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
@@ -137,8 +137,8 @@ class UsuariosController extends Controller
             $url = config('app.public_url') . $urlRelativa;
 
             // salva no banco (salva a URL pública completa)
-            $usuario->foto_perfil = $url;
-            $usuario->save();
+            $user->profile_photo = $url;
+            $user->save();
 
             return response()->json([
                 'success' => true,
@@ -157,8 +157,8 @@ class UsuariosController extends Controller
     public function removerImagem($id)
     {
         // buscar usuário
-        $usuario = Usuarios::find($id);
-        if (!$usuario) {
+        $user = User::find($id);
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Usuário não encontrado.'
@@ -167,8 +167,8 @@ class UsuariosController extends Controller
 
         // remover imagem antiga se existir e não for URL externa (como ui-avatars)
         try {
-            if ($usuario->foto_perfil && !$this->isExternalUrl($usuario->foto_perfil)) {
-                $oldPath = $this->extractStoragePath($usuario->foto_perfil);
+            if ($user->profile_photo && !$this->isExternalUrl($user->profile_photo)) {
+                $oldPath = $this->extractStoragePath($user->profile_photo);
 
                 if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
@@ -176,9 +176,8 @@ class UsuariosController extends Controller
             }
 
             // remove a foto de perfil (o mutator irá definir a imagem padrão automaticamente)
-            $usuario->foto_perfil = '';
-            $usuario->save();
-
+            $user->profile_photo = '';
+            $user->save();
             return response()->json([
                 'success' => true,
                 'message' => 'Imagem removida com sucesso.'
@@ -236,7 +235,7 @@ class UsuariosController extends Controller
      *
      * Retorna a lista de menus favoritos do usuário autenticado.
      */
-    public function getMenusFavoritos(Request $request)
+    public function getFavoriteMenus(Request $request)
     {
 
         $user = $request->user();
@@ -245,12 +244,12 @@ class UsuariosController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        /** @var Usuarios $user Usuário autenticado */
+        /** @var User $user Usuário autenticado */
         $user = $request->user();
 
         $favoritos = $user
-            ->menus_favoritos()
-            ->with('menu_pai')
+            ->favorite_menus()
+            ->with('parent_menu_id')
             ->get()
             ->setHidden(['pivot'])
         ;
@@ -265,14 +264,14 @@ class UsuariosController extends Controller
      * Recebe o ID do menu e alterna seu status de favorito para o usuário autenticado.
      * Se o menu já estiver favoritado, ele será desfavoritado, e vice-versa.
      */
-    public function favoritarMenu(Request $request, Menus $menu)
+    public function favoriteMenu(Request $request, Menu $menu)
     {
         try {
-            /** @var Usuarios $user Usuário autenticado */
+            /** @var User $user Usuário autenticado */
             $user = $request->user();
 
             $result = $user
-                ->menus_favoritos()
+                ->favorite_menus()
                 ->toggle($menu->id)
             ;
 

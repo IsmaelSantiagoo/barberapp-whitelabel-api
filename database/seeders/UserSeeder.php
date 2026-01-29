@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Usuarios;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class UsuariosSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,13 +18,13 @@ class UsuariosSeeder extends Seeder
             return;
         }
 
-        Usuarios::create([
-            'nome' => 'Desenvolvedor',
+        User::create([
+            'name' => 'Desenvolvedor',
             'email' => 'dev@example.com',
-            'foto_perfil' => null,
-            'senha' => $defaultPassword,
-            'status' => 1,
-            'tipo' => 1
+            'profile_photo' => null,
+            'password' => $defaultPassword,
+            'first_access' => true,
+            'role' => 'user'
         ]);
     }
 }

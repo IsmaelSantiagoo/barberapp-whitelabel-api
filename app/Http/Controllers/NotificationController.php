@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Notificacoes;
-use App\Models\Usuarios;
+use App\Models\Notification;
+use App\Models\User;
 use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class NotificacoesController extends Controller
+class NotificationController extends Controller
 {
     /**
      * Disparar notificação
@@ -21,46 +21,46 @@ class NotificacoesController extends Controller
     {
         try {
             $request->validate([
-                'titulo' => ['nullable', 'string'],
-                'mensagem' => ['required', 'string'],
-                'tipo' => ['required', 'string', 'in:info,warning,error,success'],
+                'title' => ['nullable', 'string'],
+                'message' => ['required', 'string'],
+                'type' => ['required', 'string', 'in:info,warning,error,success'],
                 'menu_id' => ['nullable', 'exists:menus,id'],
                 'link' => ['nullable', 'string'],
-                'usuarios' => ['array'],
-                'usuarios.*' => ['exists:usuarios,id'],
+                'users' => ['array'],
+                'users.*' => ['exists:users,id'],
             ]);
 
-            $usuariosIds = $request->input('usuarios', []);
-            $query = Usuarios::query();
+            $usersIds = $request->input('users', []);
+            $query = User::query();
 
-            if (empty($usuariosIds)) {
-                $usuarios = $query->get();
+            if (empty($usersIds)) {
+                $users = $query->get();
             }
             else {
-                $query->where(function ($q) use ($usuariosIds) {
-                    if (!empty($usuariosIds)) {
-                        $q->orWhereIn('id', $usuariosIds);
+                $query->where(function ($q) use ($usersIds) {
+                    if (!empty($usersIds)) {
+                        $q->orWhereIn('id', $usersIds);
                     }
                 });
 
-                $usuarios = $query->get()->unique('id')->values();
+                $users = $query->get()->unique('id')->values();
             }
 
-            $requestData = $request->only(['titulo', 'mensagem', 'tipo', 'menu_id', 'link']);
+            $requestData = $request->only(['title', 'message', 'type', 'menu_id', 'link']);
 
-            foreach ($usuarios as $usuario) {
+            foreach ($users as $user) {
                 $data = array_merge($requestData, [
-                    'usuario_id' => $usuario->id,
+                    'user_id' => $user->id,
                     'id' => Str::uuid()->toString(),
                 ]);
 
-                $usuario->notify(new UserNotification($data));
+                $user->notify(new UserNotification($data));
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Notificação disparada com sucesso.',
-                'data' => $usuarios,
+                'data' => $users,
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -90,20 +90,20 @@ class NotificacoesController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        $notificacoes = Notificacoes::query()
+        $notifications = Notification::query()
             ->with('menu')
-            ->where('usuario_id', $user->id)
-            ->orderBy('data_envio', 'asc')
+            ->where('user_id', $user->id)
+            ->orderBy('sent_at', 'asc')
             ->get()
-            ->map(function ($notificacao) {
+            ->map(function ($notification) {
                 return [
-                    'id' => $notificacao->id,
-                    'titulo' => $notificacao->titulo,
-                    'mensagem' => $notificacao->mensagem,
-                    'tipo' => $notificacao->tipo,
-                    'link' => $notificacao->menu ? $notificacao->menu->rota : null,
-                    'data_envio' => $notificacao->data_envio,
-                    'lida' => $notificacao->data_leitura !== null,
+                    'id' => $notification->id,
+                    'title' => $notification->title,
+                    'message' => $notification->message,
+                    'type' => $notification->type,
+                    'link' => $notification->menu ? $notification->menu->route : null,
+                    'sent_at' => $notification->sent_at,
+                    'read' => $notification->read_date !== null,
                 ];
             })
         ;
@@ -111,7 +111,7 @@ class NotificacoesController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notificações consultadas com sucesso.',
-            'data' => $notificacoes,
+            'data' => $notifications,
         ]);
     }
 
@@ -125,18 +125,18 @@ class NotificacoesController extends Controller
         try {
             $request->validate([
                 'id' => ['required', 'array'],
-                'id.*' => ['required', 'string', 'exists:notificacoes,id'],
+                'id.*' => ['required', 'string', 'exists:notifications,id'],
             ]);
 
-            $notificacoes = Notificacoes::query()
+            $notifications = Notification::query()
                 ->whereIn('id', $request->input('id'))
                 ->get()
             ;
 
-            foreach ($notificacoes as $notificacao) {
-                if ($notificacao->usuario_id === $request->user()->id) {
-                    $notificacao->data_leitura = now();
-                    $notificacao->save();
+            foreach ($notifications as $notification) {
+                if ($notification->user_id === $request->user()->id) {
+                    $notification->read_date = now();
+                    $notification->save();
                 }
             }
 

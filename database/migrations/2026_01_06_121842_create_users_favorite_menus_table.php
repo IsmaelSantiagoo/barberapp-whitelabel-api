@@ -10,32 +10,22 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('notificacoes', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-
-            $table->string('titulo')->nullable();
-            $table->string('mensagem');
-            $table->string('tipo');
-            $table->text('link')->nullable();
-            $table->dateTimeTz('data_envio')->useCurrent();
-            $table->dateTimeTz('data_leitura')->nullable();
-
+        Schema::create('users_favorite_menus', function (Blueprint $table) {
             $table
-                ->unsignedInteger('usuario_id')
-                ->foreignId('usuario_id')
-                ->constrained('usuarios')
+                ->unsignedInteger('user_id')
+                ->constrained('users')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete()
             ;
 
             $table
                 ->unsignedInteger('menu_id')
-                ->foreignId('menu_id')
-                ->nullable()
                 ->constrained('menus')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete()
             ;
+
+            $table->unique(['user_id', 'menu_id']);
         });
     }
 
@@ -44,6 +34,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('notificacoes');
+        Schema::dropIfExists('users_favorite_menus');
     }
 };

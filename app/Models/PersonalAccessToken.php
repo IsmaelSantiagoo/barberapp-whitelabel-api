@@ -6,5 +6,5 @@ use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
-    protected $table = 'sys_tokens_acesso';
+    protected $table = 'sys_access_tokens';
 }

@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
-            $table->id();
-            $table->string('title')->unique();
-            $table->string('icon')->nullable();
-            $table->string('route')->nullable();
-            $table->integer('order')->default(0);
-            $table->unsignedBigInteger('parent_menu_id')->nullable();
-            $table->unsignedInteger('responsible_user')->nullable();
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('profile_photo')->nullable();
+            $table->string('role')->default('user');
+            $table->boolean('first_access')->default(true);
             $table->timestamps();
             $table->foreignId('tenant_id')->nullable()->constrained()->onDelete('cascade');
         });
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('users');
     }
 };

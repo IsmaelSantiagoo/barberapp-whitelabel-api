@@ -2,160 +2,119 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuarios;
-use App\Notifications\UserNotification;
-// use App\Services\GoogleAuthService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    /**
-     * Monta array de dados do usuário para retorno na autenticação.
-     *
-     * @param  Usuarios  $user  Usuário autenticado
-     * @return array Dados do usuário
-     */
-    private function userDataArray($user): array
-    {
-        return [
-            'id' => $user->id,
-            'nome' => $user->nome,
-            'email' => $user->email,
-            'avatar' => $user->foto_perfil,
-            'tipo' => $user->tipo,
-        ];
-    }
 
     /**
-     * Gera e retorna um token único para o usuário, removendo tokens antigos.
-     *
-     * @param  Usuarios  $user  Usuário para o qual gerar o token
-     * @param  string  $tokenName  Nome do token (padrão: 'web_auth')
-     * @return string Token gerado
+     * Registro de novos usuários (Barbeiros/Staff) vinculados ao Tenant atual
      */
-    private function generateToken($user, $tokenName = 'web_auth'): string
+    public function register(Request $request): JsonResponse
     {
-        $user->tokens()->where('name', $tokenName)->delete();
-
-        return $user->createToken($tokenName)->plainTextToken;
-    }
-
-    /**
-     * Autenticação do usuário básica.
-     *
-     * @param  Request  $request  Dados da requisição
-     * @return JsonResponse $JsonResponse      Token de autenticação e dados do usuário
-     */
-    public function login(Request $request)
-    {
-        // Valida os dados enviados pelo usuário
-        $payload = $request->validate([
-            'email' => ['required', 'string'],
-            'senha' => ['required', 'string'],
-        ]);
-
-        // Busca o usuário pelo campo 'email'
-        $user = Usuarios::query()
-            ->where('email', $payload['email'])
-            ->first()
-        ;
-
-        // Verifica se o usuário existe e está ativo
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Acesso não autorizado. Tente novamente ou contate o administrador.',
-                'debug_error' => 'Usuário não encontrado ou senha inválida.',
-            ], 401);
-        }
-
-        // Validação de senha segura
-        if (!Hash::check($payload['senha'], $user->senha)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Credenciais inválidas.',
-            ], 401);
-        }
-
-        // Define o nome do token conforme o ambiente e o gera
-        $tokenName = (config('app.env') !== 'production' && str_starts_with($request->userAgent(), 'PostmanRuntime/')) ? 'postman_auth' : 'web_auth';
-        $token = $this->generateToken($user, $tokenName);
-
-        // gerar uuid para a notificação
-        $notificationId = 'welcome-notify';
-
-        // notificação
-        $notification = [
-            'id' => $notificationId,
-            'titulo' => 'Bem-vindo ao nosso sistema de gestão, ' . ucwords(strtolower($user->nome)) . '!',
-            'mensagem' => 'Estamos felizes em tê-lo(a) conosco. Explore nossos recursos e aproveite ao máximo sua experiência.',
-            'tipo' => 'info',
-            'usuario_id' => $user->id,
-        ];
-
-        // notificação de boas vindas, só aparece se a notificação ainda não foi enviada
-        if (!$user->notificacoes()->where('id', $notificationId)->exists()) {
-            // enviar notificação
-            $user->notify(new UserNotification($notification));
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login realizado com sucesso.',
-            'data' => [
-                'token' => $token,
-                'usuario' => $this->userDataArray($user),
-            ],
-        ]);
-    }
-
-    /**
-     * Registrar novo usuário
-     *
-     * Cria um usuário e retorna o token JWT
-     */
-    public function register(Request $request)
-    {
-        // Valida os dados relativos ao usuário na requisição
-        $validator = Validator::make($request->all(), Usuarios::createRules(), Usuarios::messages());
+        // 1. Validamos usando as regras e mensagens definidas na sua Model User
+        $validator = Validator::make(
+            $request->all(),
+            User::createRules(),
+            User::messages()
+        );
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ocorreu um erro ao validar os dados do usuario.',
-                'debug_errors' => $validator->errors(),
-            ], 422);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        Usuarios::create([
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'senha' => $request->senha,
-            'foto_perfil' => $request->avatar,
-            'status' => $request->status ?? true,
-            'tipo' => $request->tipo,
+        // 2. Criamos o usuário
+        // Nota: tenant_id será preenchido automaticamente pela Trait BelongsToTenant
+        // se a rota estiver protegida pelo middleware identify.tenant.
+        // Os Mutators na Model cuidarão do Hash da senha e lowercases.
+        $user = User::create([
+            'name'          => $request->name,
+            'email'         => $request->email,
+            'password'      => $request->password, // Mutator faz o Hash automático
+            'role'          => $request->role ?? 'user',
+            'profile_photo' => $request->profile_photo, // Mutator gera avatar se for null
+            'first_access'  => true,
         ]);
 
+        // 3. Geramos o Token de acesso imediato
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'success' => true,
-            'message' => 'Usuário registrado com sucesso.',
+            'message' => 'Usuário registrado com sucesso!',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'data' => [
+                'user' => $user
+            ]
+        ], 201);
+    }
+
+    /**
+     * Autentica o usuário e retorna o Token + Dados da Barbearia
+     */
+    public function login(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|string',
+            'password' => 'required|string',
+        ]);
+
+        // Buscamos o usuário pelo email (o mutador garante que o email no banco é lowercase)
+        $user = User::with('tenant')
+            ->where('email', mb_strtolower($request->email))
+            ->first();
+
+        // Verificação de segurança
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['As credenciais informadas estão incorretas.'],
+            ]);
+        }
+
+        // Remove tokens antigos para evitar múltiplas sessões (opcional)
+        $user->tokens()->delete();
+
+        // Gera o token via Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login realizado com sucesso',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'data' => [
+                'user' => $user->makeHidden('tenant'), // Esconde a relação para não duplicar no JSON
+                'tenant' => $user->tenant, // Retorna os dados da barbearia (slug, cor, etc)
+            ]
         ]);
     }
 
     /**
-     * Logout
-     *
-     * Invalida o token de acesso do usuário
+     * Retorna os dados do usuário logado (Check Me)
      */
-    public function logout(Request $request)
+    public function me(Request $request): JsonResponse
+    {
+        $user = $request->user()->load('tenant');
+
+        return response()->json([
+            'user' => $user,
+            'tenant' => $user->tenant
+        ]);
+    }
+
+    /**
+     * Revoga o token e encerra a sessão
+     */
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'success' => true,
-            'message' => 'Logout realizado com sucesso.',
+            'message' => 'Sessão encerrada com sucesso'
         ]);
     }
 }

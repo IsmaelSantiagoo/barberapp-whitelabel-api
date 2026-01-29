@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menus;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 
-class MenusController extends Controller
+class MenuController extends Controller
 {
     // Listar todos os menus
     public function read()
     {
-        $menus = Menus::whereNull('menu_pai_id')->get();
+        $menus = Menu::whereNull('parent_menu_id')->get();
 
         // armazena submenus em cada menu
         foreach ($menus as $menu) {
-            $subMenus = Menus::where('menu_pai_id', $menu->id)->get();
+            $subMenus = Menu::where('parent_menu_id', $menu->id)->get();
             $menu->submenus = $subMenus;
         }
 
@@ -36,31 +36,31 @@ class MenusController extends Controller
     public function create(Request $request)
     {
         $request->validate([
-            'titulo' => 'required|string',
-            'icone' => 'nullable|string',
-            'rota' => 'nullable|string',
-            'ordem' => 'nullable|integer',
-            'menu_pai_id' => 'nullable|integer|exists:menus,id',
-            'usuario_responsavel' => 'required|integer|exists:usuarios,id',
+            'title' => 'required|string',
+            'icon' => 'nullable|string',
+            'route' => 'nullable|string',
+            'order' => 'nullable|integer',
+            'parent_menu_id' => 'nullable|integer|exists:menus,id',
+            'responsible_user' => 'required|integer|exists:users,id',
         ]);
 
         // validação de cadastro completo
         try {
             // Verifica se já existe menu com o mesmo título
-            $existe = Menus::where('titulo', $request->titulo)->first();
+            $existe = Menu::where('title', $request->title)->first();
             if ($existe) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Menu já cadastrado.'
                 ], 400);
             }
-            Menus::create([
-                'titulo' => $request->titulo,
-                'icone' => $request->icone,
-                'rota' => $request->rota,
-                'ordem' => $request->ordem,
-                'menu_pai_id' => $request->menu_pai_id,
-                'usuario_responsavel' => $request->usuario_responsavel,
+            Menu::create([
+                'title' => $request->title,
+                'icon' => $request->icon,
+                'route' => $request->route,
+                'order' => $request->order,
+                'parent_menu_id' => $request->parent_menu_id,
+                'responsible_user' => $request->responsible_user,
             ]);
             return response()->json([
                 'success' => true,
@@ -77,7 +77,7 @@ class MenusController extends Controller
     // Exibir um menu específico
     public function show($id)
     {
-        $menu = Menus::find($id);
+        $menu = Menu::find($id);
 
         try {
             if (!$menu) {
@@ -88,7 +88,7 @@ class MenusController extends Controller
             }
             // dados do menu formatados
                 $menuArray = $menu->toArray();
-                $menuArray['usuario_responsavel'] = $menu->usuario_responsavel;
+                $menuArray['responsible_user'] = $menu->responsible_user;
                 return response()->json([
                     'success' => true,
                     'message' => 'Menu encontrado com sucesso.',
@@ -107,15 +107,15 @@ class MenusController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'titulo' => 'required|string',
-            'icone' => 'nullable|string',
-            'rota' => 'nullable|string',
-            'ordem' => 'nullable|integer',
-            'menu_pai_id' => 'nullable|integer|exists:menus,id',
-            'usuario_responsavel' => 'required|integer|exists:usuarios,id',
+            'title' => 'required|string',
+            'icon' => 'nullable|string',
+            'route' => 'nullable|string',
+            'order' => 'nullable|integer',
+            'parent_menu_id' => 'nullable|integer|exists:menus,id',
+            'responsible_user' => 'required|integer|exists:users,id',
         ]);
 
-        $menu = Menus::find($id);
+        $menu = Menu::find($id);
         try {
             if (!$menu) {
                 return response()->json([
@@ -124,12 +124,12 @@ class MenusController extends Controller
                 ], 404);
             }
                 $menu->update([
-                    'titulo' => $request->titulo,
-                    'icone' => $request->icone,
-                    'rota' => $request->rota,
-                    'ordem' => $request->ordem,
-                    'menu_pai_id' => $request->menu_pai_id,
-                    'usuario_responsavel' => $request->usuario_responsavel,
+                    'title' => $request->title,
+                    'icon' => $request->icon,
+                    'route' => $request->route,
+                    'order' => $request->order,
+                    'parent_menu_id' => $request->parent_menu_id,
+                    'responsible_user' => $request->responsible_user,
                 ]);
             return response()->json([
                 'success' => true,
@@ -147,7 +147,7 @@ class MenusController extends Controller
     // Deletar um menu
     public function delete($id)
     {
-        $menu = Menus::find($id);
+        $menu = Menu::find($id);
         try {
             if (!$menu) {
                 return response()->json([

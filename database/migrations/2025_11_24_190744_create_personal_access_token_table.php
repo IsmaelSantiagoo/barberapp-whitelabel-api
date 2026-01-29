@@ -10,7 +10,7 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sys_tokens_acesso', function (Blueprint $table) {
+        Schema::create('sys_access_tokens', function (Blueprint $table) {
             $table->id();
             $table->morphs('tokenable');
             $table->text('name');
@@ -27,6 +27,6 @@ return new class() extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_tokens_acesso');
+        Schema::dropIfExists('sys_access_tokens');
     }
 };

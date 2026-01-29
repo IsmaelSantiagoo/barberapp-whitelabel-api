@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MenusController;
+use App\Http\Controllers\MenuController;
 
-Route::get('', [MenusController::class, 'read']); // Listar todos os menus
-Route::get('{id}', [MenusController::class, 'show']); // Consultar menu específico
-Route::post('', [MenusController::class, 'create']); // Criar novo menu
-Route::patch('edit/{id}', [MenusController::class, 'update']); // Atualizar menu
-Route::delete('{id}', [MenusController::class, 'delete']); // Remover menu
+Route::get('', [MenuController::class, 'read']); // Listar todos os menus
+Route::get('{id}', [MenuController::class, 'show']); // Consultar menu específico
+Route::post('', [MenuController::class, 'create']); // Criar novo menu
+Route::patch('edit/{id}', [MenuController::class, 'update']); // Atualizar menu
+Route::delete('{id}', [MenuController::class, 'delete']); // Remover menu
