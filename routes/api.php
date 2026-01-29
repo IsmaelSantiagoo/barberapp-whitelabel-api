@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterTenantController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 use App\Support\AppRouter;
 use Illuminate\Support\Facades\Broadcast;

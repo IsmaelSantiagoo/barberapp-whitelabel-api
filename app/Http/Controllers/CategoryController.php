@@ -11,7 +11,11 @@ class CategoryController extends Controller
     {
         // Retorna apenas as categorias da barbearia logada (graças à Trait)
         $categories = Category::withCount('services')->get();
-        return response()->json($categories);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Categorias consultadas com sucesso!',
+            'data' => $categories
+        ]);
     }
 
     public function store(Request $request)
