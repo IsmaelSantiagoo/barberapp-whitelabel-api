@@ -10,7 +10,7 @@ class CategoryController extends Controller
     public function index()
     {
         // Retorna apenas as categorias da barbearia logada (graças à Trait)
-        $categories = Category::withCount('services')->get();
+        $categories = Category::with('services')->get();
         return response()->json([
             'status' => 'success',
             'message' => 'Categorias consultadas com sucesso!',

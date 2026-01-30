@@ -11,7 +11,12 @@ class ServiceController extends Controller
     public function index()
     {
         // Lista todos os serviços da barbearia com os dados da categoria
-        return response()->json(Service::with('category')->get());
+        $services = Service::get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Serviços carregados com sucesso',
+            'data' => $services
+        ]);
     }
 
     public function store(Request $request)

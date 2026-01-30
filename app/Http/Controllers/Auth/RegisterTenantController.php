@@ -35,7 +35,7 @@ class RegisterTenantController extends Controller
             $user = $tenant->users()->create([
                 'name' => $request->owner_name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => $request->password,
                 'role' => 'owner',
             ]);
 
@@ -46,10 +46,13 @@ class RegisterTenantController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
+                'success' => true,
                 'message' => 'Barbearia cadastrada com sucesso!',
-                'tenant' => $tenant,
-                'user' => $user,
-                'token' => $token
+                'data' => [
+                    'tenant' => $tenant,
+                    'user' => $user,
+                ],
+                'access_token' => $token
             ], 201);
         });
     }

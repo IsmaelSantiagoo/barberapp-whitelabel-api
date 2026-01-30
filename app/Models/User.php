@@ -111,6 +111,11 @@ class User extends Authenticatable
         $this->attributes['role'] = mb_strtolower($value) ?: 'user';
     }
 
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
+
     // --- JWT Methods ---
 
     public function getJWTIdentifier()

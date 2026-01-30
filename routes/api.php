@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::post('auth/login', [AuthController::class, 'login']);
-Route::post('auth/register', [AuthController::class, 'register']);
+Route::post('auth/register', [AuthController::class, 'register'])->middleware('identify.tenant');
 Route::post('/register-tenant', [RegisterTenantController::class, 'store']);
 
 Route::middleware(['auth:sanctum', 'identify.tenant'])->group(function () {

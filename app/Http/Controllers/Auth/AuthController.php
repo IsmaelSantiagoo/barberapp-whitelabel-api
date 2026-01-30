@@ -36,10 +36,10 @@ class AuthController extends Controller
         $user = User::create([
             'name'          => $request->name,
             'email'         => $request->email,
-            'password'      => Hash::make($request->password), // Mutator faz o Hash automático
+            'password'      => $request->password, // Mutator faz o Hash automático
             'role'          => $request->role ?? 'user',
             'profile_photo' => $request->profile_photo, // Mutator gera avatar se for null
-            'first_access'  => true,
+            'first_access'  => true
         ]);
 
         // 3. Geramos o Token de acesso imediato
@@ -63,6 +63,7 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email|string',
             'password' => 'required|string',
+            'appMode' => 'required|string|in:admin,client',
         ]);
 
         // Buscamos o usuário pelo email (o mutador garante que o email no banco é lowercase)
@@ -72,6 +73,14 @@ class AuthController extends Controller
 
         // Verificação de segurança
         if (!$user || !Hash::check($request->password, $user->password)) {
+
+            if ($request->appMode === 'admin' && $user && !in_array($user->get("role"), ['admin', 'owner'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Acesso negado. Você não possui permissão para acessar o painel administrativo.',
+                ], 403);
+            }
+
             throw ValidationException::withMessages([
                 'email' => ['As credenciais informadas estão incorretas.'],
             ]);

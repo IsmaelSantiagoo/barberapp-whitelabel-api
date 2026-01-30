@@ -13,6 +13,27 @@ use Illuminate\Validation\Rules\Password as RulesPassword;
 class UserController extends Controller
 {
 
+    // função para listar usuários
+    public function index()
+    {
+        try {
+            $users = User::all()
+                ->makeHidden(['password', 'remember_token'])
+                ->where('role', '!=', 'owner'); // ocultar senha e token de lembrança
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuários consultados com sucesso',
+                'data' => $users,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao consultar usuários: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     // função para alterar a senha do usuário
     public function alterarSenha(Request $request, $id)
     {
