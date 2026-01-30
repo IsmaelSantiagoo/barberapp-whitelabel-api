@@ -46,11 +46,11 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Usuário registrado com sucesso!',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
             'data' => [
-                'user' => $user
+                'user' => $user,
+                'access_token' => $token,
             ]
         ], 201);
     }
@@ -84,12 +84,12 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login realizado com sucesso',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
+            'success' => true,
+            'message' => 'Login realizado com sucesso!',
             'data' => [
                 'user' => $user->makeHidden('tenant'), // Esconde a relação para não duplicar no JSON
                 'tenant' => $user->tenant, // Retorna os dados da barbearia (slug, cor, etc)
+                'access_token' => $token,
             ]
         ]);
     }
@@ -99,12 +99,21 @@ class AuthController extends Controller
      */
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load('tenant');
+        try {
+            $user = $request->user()->load('tenant');
 
-        return response()->json([
-            'user' => $user,
-            'tenant' => $user->tenant
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Dados do usuário autenticado',
+                'data' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao obter os dados do usuário autenticado',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
