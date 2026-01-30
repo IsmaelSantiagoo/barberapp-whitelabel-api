@@ -36,7 +36,7 @@ class AuthController extends Controller
         $user = User::create([
             'name'          => $request->name,
             'email'         => $request->email,
-            'password'      => $request->password, // Mutator faz o Hash automático
+            'password'      => Hash::make($request->password), // Mutator faz o Hash automático
             'role'          => $request->role ?? 'user',
             'profile_photo' => $request->profile_photo, // Mutator gera avatar se for null
             'first_access'  => true,
