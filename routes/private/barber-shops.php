@@ -1,6 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TenantController;
+use App\Http\Controllers\BarbershopController;
 
-Route::get('', [TenantController::class, 'index']);
+Route::get('', [BarbershopController::class, 'index']);

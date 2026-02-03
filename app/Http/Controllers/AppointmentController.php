@@ -14,7 +14,7 @@ class AppointmentController extends Controller
     {
         try {
             // Retorna apenas as agendas da barbearia logada (graças à Trait)
-            $appointments = Appointment::with('services')->get();
+            $appointments = Appointment::with('service')->get();
             return response()->json([
                 'success' => true,
                 'message' => 'Agendas consultadas com sucesso!',
@@ -51,7 +51,7 @@ class AppointmentController extends Controller
                 throw new \Exception('Este horário já está agendado. Por favor, escolha outro horário.');
             }
 
-            // O tenant_id é preenchido automaticamente pela Trait no evento 'creating'
+            // O barbershop_id é preenchido automaticamente pela Trait no evento 'creating'
             $appointment = Appointment::create($request->all());
 
             return response()->json([
@@ -69,7 +69,7 @@ class AppointmentController extends Controller
 
     public function show(Appointment $appointment)
     {
-        // Se a agenda não pertencer ao tenant logado,
+        // Se a agenda não pertencer à barbearia logada,
         // a Trait fará o Laravel retornar 404 automaticamente
         return response()->json($appointment->load('services'));
     }
@@ -144,21 +144,21 @@ class AppointmentController extends Controller
         $time = $request->input('time');
         $dayOfWeek = $date->dayOfWeek;
 
-        // Obter o tenant_id da autenticação (da Trait)
+        // Obter o barbershop_id da autenticação (da Trait)
         $user = Auth::user();
 
         if (!$user) {
             throw new \Exception('Usuário não autenticado');
         }
 
-        $tenantId = $user->tenant_id ?? null;
+        $barbershopId = $user->barbershop_id ?? null;
 
-        if (!$tenantId) {
+        if (!$barbershopId) {
             throw new \Exception('Barbearia não identificada');
         }
 
         // Verificar se existe business_hours para este dia
-        $businessHour = BusinessHour::where('tenant_id', $tenantId)
+        $businessHour = BusinessHour::where('barbershop_id', $barbershopId)
             ->where('day_of_week', $dayOfWeek)
             ->first();
 

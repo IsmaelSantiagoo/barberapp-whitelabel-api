@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Notification extends Model
 {
-    use BelongsToTenant, HasUuids;
+    use BelongsToBarbershop, HasUuids;
     public $timestamps = false;
 
     protected $fillable = [
@@ -20,7 +20,7 @@ class Notification extends Model
         'read_at',
         'user_id',
         'menu_id',
-        'tenant_id',
+        'barbershop_id',
     ];
 
     protected $casts = [

@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->uuid('tenant_id');
-            $table->foreign('tenant_id')
+            $table->uuid('barbershop_id');
+            $table->foreign('barbershop_id')
                 ->references('id')
-                ->on('tenants')
+                ->on('barbershops')
                 ->onDelete('cascade');
             $table->string('name'); // Ex: "Cabelo", "Barba", "Combos"
             $table->string('description')->nullable();

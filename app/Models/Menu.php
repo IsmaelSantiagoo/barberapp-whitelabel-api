@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-    use BelongsToTenant;
+    use BelongsToBarbershop;
     protected $table = 'menus';
 
     // protected $primaryKey = 'id'; // padrão do Eloquent

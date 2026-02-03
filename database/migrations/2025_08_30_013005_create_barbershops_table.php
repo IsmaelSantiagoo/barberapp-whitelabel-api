@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tenants', function (Blueprint $table) {
+        Schema::create('barbershops', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('company_name'); // Nome da Barbearia
             $table->string('slug')->unique(); // ex: barbearia-do-ze (usado na URL ou subdomínio)
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tenants');
+        Schema::dropIfExists('barbershops');
     }
 };

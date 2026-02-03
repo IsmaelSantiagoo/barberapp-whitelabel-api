@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
 
     /**
-     * Registro de novos usuários (Barbeiros/Staff) vinculados ao Tenant atual
+     * Registro de novos usuários (Barbeiros/Staff) vinculados à Barbearia atual
      */
     public function register(Request $request): JsonResponse
     {
@@ -30,8 +30,8 @@ class AuthController extends Controller
         }
 
         // 2. Criamos o usuário
-        // Nota: tenant_id será preenchido automaticamente pela Trait BelongsToTenant
-        // se a rota estiver protegida pelo middleware identify.tenant.
+        // Nota: barbershop_id será preenchido automaticamente pela Trait BelongsToBarbershop
+        // se a rota estiver protegida pelo middleware identify.barbershop.
         // Os Mutators na Model cuidarão do Hash da senha e lowercases.
         $user = User::create([
             'name'          => $request->name,
@@ -67,7 +67,7 @@ class AuthController extends Controller
         ]);
 
         // Buscamos o usuário pelo email (o mutador garante que o email no banco é lowercase)
-        $user = User::with('tenant')
+        $user = User::with('barbershop.businessHours')
             ->where('email', mb_strtolower($request->email))
             ->first();
 
@@ -96,8 +96,8 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login realizado com sucesso!',
             'data' => [
-                'user' => $user->makeHidden('tenant'), // Esconde a relação para não duplicar no JSON
-                'tenant' => $user->tenant, // Retorna os dados da barbearia (slug, cor, etc)
+                'user' => $user->makeHidden('barbershop'), // Esconde a relação para não duplicar no JSON
+                'barbershop' => $user->barbershop, // Retorna os dados da barbearia (slug, cor, etc)
                 'access_token' => $token,
             ]
         ]);
@@ -109,7 +109,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         try {
-            $user = $request->user()->load('tenant');
+            $user = $request->user()->load('barbershop.businessHours');
 
             return response()->json([
                 'success' => true,

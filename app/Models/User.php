@@ -6,7 +6,7 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,7 +26,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
-    use CanResetPassword, HasApiTokens, Notifiable, BelongsToTenant;
+    use CanResetPassword, HasApiTokens, Notifiable, BelongsToBarbershop;
 
     protected $primaryKey = 'id';
 

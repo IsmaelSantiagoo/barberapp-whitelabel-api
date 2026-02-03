@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant; // Importante: a trait que criamos
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use HasFactory, BelongsToBarbershop;
 
     protected $fillable = [
-        'tenant_id',
+        'barbershop_id',
         'name',
         'active'
     ];

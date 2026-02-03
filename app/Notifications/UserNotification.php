@@ -64,7 +64,7 @@ class UserNotification extends Notification implements ShouldQueue, DatabaseNoti
             'link'        => $this->data['link'] ?? null,
 
             // Metadados úteis para o front
-            'tenant_id'   => $this->data['tenant_id'] ?? null, // Útil para whitelabel
+            'barbershop_id'   => $this->data['barbershop_id'] ?? null, // Útil para whitelabel
             'sent_at'     => now()->toIso8601String(), // Formato padrão ISO para JS
             'read'        => false,
         ]);

@@ -24,7 +24,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // O tenant_id é preenchido automaticamente pela Trait no evento 'creating'
+        // O barbershop_id é preenchido automaticamente pela Trait no evento 'creating'
         $category = Category::create($request->all());
 
         return response()->json([
@@ -35,7 +35,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        // Se a categoria não pertencer ao tenant logado,
+        // Se a categoria não pertencer à barbearia logada,
         // a Trait fará o Laravel retornar 404 automaticamente
         return response()->json($category->load('services'));
     }

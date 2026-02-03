@@ -37,10 +37,10 @@ return new class() extends Migration {
                 ->cascadeOnDelete()
             ;
 
-            $table->uuid('tenant_id')->nullable();
-            $table->foreign('tenant_id')
+            $table->uuid('barbershop_id')->nullable();
+            $table->foreign('barbershop_id')
                 ->references('id')
-                ->on('tenants')
+                ->on('barbershops')
                 ->onDelete('cascade');
         });
     }

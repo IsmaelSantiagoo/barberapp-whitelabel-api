@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BusinessHour extends Model
 {
-    use HasUuids, BelongsToTenant;
+    use HasUuids, BelongsToBarbershop;
 
     /**
      * The table associated with the model.
@@ -30,7 +30,7 @@ class BusinessHour extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'tenant_id',
+        'barbershop_id',
         'day_of_week',
         'open_time',
         'close_time',
@@ -45,14 +45,6 @@ class BusinessHour extends Model
         'is_open' => 'boolean',
         'created_at' => 'datetime',
     ];
-
-    /**
-     * Get the tenant that owns this business hour.
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id', 'id');
-    }
 
     /**
      * Days of week constants

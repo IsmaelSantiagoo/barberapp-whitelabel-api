@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTenantRequest extends FormRequest
+class StoreBarbershopRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class StoreTenantRequest extends FormRequest
         return [
             // Dados da Barbearia
             'company_name' => 'required|string|max:255',
-            'slug'         => 'nullable|string|unique:tenants,slug|alpha_dash', // Opcional, se não vier, geramos
+            'slug'         => 'nullable|string|unique:barbershops,slug|alpha_dash',
             'primary_color' => 'nullable|hex_color',
 
             // Dados do Dono (Admin)

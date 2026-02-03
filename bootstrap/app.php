@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->alias([
-            'identify.tenant' => \App\Http\Middleware\IdentifyTenant::class,
+            'identify.barbershop' => \App\Http\Middleware\IdentifyBarbershop::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

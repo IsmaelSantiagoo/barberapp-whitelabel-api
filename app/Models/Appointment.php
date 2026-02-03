@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Appointment extends Model
 {
-    use BelongsToTenant;
+    use BelongsToBarbershop;
 
     protected $fillable = [
         'customer_id',

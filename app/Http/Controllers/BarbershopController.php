@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tenant;
+use App\Models\Barbershop;
 
-class TenantController extends Controller
+class BarbershopController extends Controller
 {
-    // listar todos os tenants
+    // listar todas as barbearias
     public function index()
     {
         try {
-            $tenants = Tenant::all();
+            $barbershops = Barbershop::with('businessHours')->get();
             return response()->json([
                 'success' => true,
                 'message' => 'Consulta realizada com sucesso.',
-                'data' => $tenants
+                'data' => $barbershops
             ]);
         } catch (\Exception $e) {
             return response()->json([

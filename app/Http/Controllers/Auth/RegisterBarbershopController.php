@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreTenantRequest;
-use App\Models\Tenant;
+use App\Http\Requests\StoreBarbershopRequest;
+use App\Models\Barbershop;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class RegisterTenantController extends Controller
+class RegisterBarbershopController extends Controller
 {
-    public function store(StoreTenantRequest $request)
+    public function store(StoreBarbershopRequest $request)
     {
         return DB::transaction(function () use ($request) {
 
@@ -19,37 +18,39 @@ class RegisterTenantController extends Controller
             $slug = $request->slug ?? Str::slug($request->company_name);
 
             // Verifica duplicidade básica de slug gerado
-            if (Tenant::where('slug', $slug)->exists()) {
+            if (Barbershop::where('slug', $slug)->exists()) {
                 $slug = $slug . '-' . rand(100, 999);
             }
 
-            // 2. Criar o Tenant (Barbearia)
-            $tenant = Tenant::create([
+            // 2. Criar a Barbearia
+            $barbershop = Barbershop::create([
                 'company_name' => $request->company_name,
                 'slug' => $slug,
                 'primary_color' => $request->primary_color ?? '#000000',
             ]);
 
-            // 3. Criar o Usuário Dono vinculado ao Tenant
-            // Nota: Como estamos criando via relação, o tenant_id é preenchido automático
-            $user = $tenant->users()->create([
+            // 3. Criar o Usuário Dono vinculado à Barbearia
+            $user = $barbershop->users()->create([
                 'name' => $request->owner_name,
                 'email' => $request->email,
                 'password' => $request->password,
                 'role' => 'owner',
             ]);
 
-            // 4. (Opcional) Criar dados iniciais para o cliente não começar do zero
-            $this->createDefaultCategories($tenant);
+            // 4. Criar dados iniciais para o cliente não começar do zero
+            $this->createDefaultCategories($barbershop);
 
-            // 5. Gerar Token (Login automático após registro)
+            // 5. Criar horários de funcionamento padrão
+            $barbershop->createDefaultBusinessHours();
+
+            // 6. Gerar Token (Login automático após registro)
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
                 'success' => true,
                 'message' => 'Barbearia cadastrada com sucesso!',
                 'data' => [
-                    'tenant' => $tenant,
+                    'barbershop' => $barbershop->load('businessHours'),
                     'user' => $user,
                 ],
                 'access_token' => $token
@@ -60,16 +61,16 @@ class RegisterTenantController extends Controller
     /**
      * Cria categorias padrão para a nova barbearia
      */
-    private function createDefaultCategories(Tenant $tenant)
+    private function createDefaultCategories(Barbershop $barbershop)
     {
         // Criando a categoria
-        $category = $tenant->categories()->create([
+        $category = $barbershop->categories()->create([
             'name' => 'Cortes Clássicos',
         ]);
 
         // Criando o serviço dentro da categoria
         $category->services()->create([
-            'tenant_id' => $tenant->id,
+            'barbershop_id' => $barbershop->id,
             'name' => 'Corte Social',
             'price' => 35.00,
             'duration_minutes' => 30

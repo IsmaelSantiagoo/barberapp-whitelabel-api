@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBarbershop;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Service extends Model
 {
-    use HasFactory, BelongsToTenant;
+    use HasFactory, BelongsToBarbershop;
 
     protected $fillable = [
-        'tenant_id',
+        'barbershop_id',
         'category_id',
         'name',
         'price',

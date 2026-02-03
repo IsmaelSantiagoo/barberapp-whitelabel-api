@@ -3,15 +3,15 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Models\Tenant;
+use App\Models\Barbershop;
 use Illuminate\Http\Request;
 
-class IdentifyTenant
+class IdentifyBarbershop
 {
     public function handle(Request $request, Closure $next)
     {
         // Tenta pegar pelo Header (útil para App Mobile/Postman)
-        $slug = $request->header('X-Tenant-Slug');
+        $slug = $request->header('X-Barbershop-Slug');
 
         // Se não tiver header, tenta pegar pelo subdomínio (útil para Web)
         // Lógica simples de exemplo: extrair 'loja1' de 'loja1.meusite.com'
@@ -23,17 +23,17 @@ class IdentifyTenant
             }
         }
 
-        $tenant = Tenant::where('slug', $slug)->first();
+        $barbershop = Barbershop::where('slug', $slug)->first();
 
-        if (!$tenant) {
+        if (!$barbershop) {
             return response()->json(['message' => 'Barbearia não encontrada.'], 404);
         }
 
         // Salva o ID na sessão ou num Singleton para usar na Trait
-        session()->put('tenant_id', $tenant->id);
+        session()->put('barbershop_id', $barbershop->id);
 
-        // Opcional: injetar o objeto tenant na requisição para fácil acesso
-        $request->merge(['tenant' => $tenant]);
+        // Opcional: injetar o objeto barbershop na requisição para fácil acesso
+        $request->merge(['barbershop' => $barbershop]);
 
         return $next($request);
     }

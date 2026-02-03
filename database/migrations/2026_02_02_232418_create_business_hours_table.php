@@ -14,18 +14,18 @@ return new class extends Migration
     {
         Schema::create('business_hours', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('tenant_id');
-            $table->foreign('tenant_id')
+            $table->uuid('barbershop_id');
+            $table->foreign('barbershop_id')
                 ->references('id')
-                ->on('tenants')
+                ->on('barbershops')
                 ->onDelete('cascade');
             $table->integer('day_of_week');
             $table->time('open_time')->default('09:00');
             $table->time('close_time')->default('18:00');
             $table->boolean('is_open')->default(true);
 
-            // Add unique constraint on tenant_id and day_of_week
-            $table->unique(['tenant_id', 'day_of_week']);
+            // Add unique constraint on barbershop_id and day_of_week
+            $table->unique(['barbershop_id', 'day_of_week']);
 
             $table->timestamps();
         });
