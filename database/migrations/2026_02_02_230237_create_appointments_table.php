@@ -11,16 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->uuid('tenant_id');
             $table->foreign('tenant_id')
                 ->references('id')
                 ->on('tenants')
                 ->onDelete('cascade');
-            $table->string('name'); // Ex: "Cabelo", "Barba", "Combos"
-            $table->string('description')->nullable();
-            $table->boolean('active')->default(true);
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('service_id');
+            $table->date('date');
+            $table->time('time');
+            $table->string('status')->default('0');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('appoinments');
     }
 };

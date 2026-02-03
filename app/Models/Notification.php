@@ -4,17 +4,14 @@ namespace App\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Notification extends Model
 {
-    use BelongsToTenant;
+    use BelongsToTenant, HasUuids;
     public $timestamps = false;
-    public $incrementing = false;
-    protected $keyType = 'string';
-    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id',
         'title',
         'message',
         'type',
@@ -23,6 +20,7 @@ class Notification extends Model
         'read_at',
         'user_id',
         'menu_id',
+        'tenant_id',
     ];
 
     protected $casts = [

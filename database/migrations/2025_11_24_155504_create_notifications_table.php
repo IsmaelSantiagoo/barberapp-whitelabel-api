@@ -37,7 +37,11 @@ return new class() extends Migration {
                 ->cascadeOnDelete()
             ;
 
-            $table->foreignId('tenant_id')->nullable()->constrained()->onDelete('cascade');
+            $table->uuid('tenant_id')->nullable();
+            $table->foreign('tenant_id')
+                ->references('id')
+                ->on('tenants')
+                ->onDelete('cascade');
         });
     }
 

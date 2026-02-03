@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tenants', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('company_name'); // Nome da Barbearia
             $table->string('slug')->unique(); // ex: barbearia-do-ze (usado na URL ou subdomínio)
             $table->string('domain')->nullable()->unique(); // Para domínio próprio

@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
+            $table->uuid('tenant_id');
+            $table->foreign('tenant_id')
+                ->references('id')
+                ->on('tenants')
+                ->onDelete('cascade');
             $table->foreignId('category_id')->constrained()->onDelete('cascade'); // Relaciona com a categoria
 
             $table->string('name'); // Ex: "Corte Degradê"
