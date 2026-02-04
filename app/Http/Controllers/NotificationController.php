@@ -17,7 +17,7 @@ class NotificationController extends Controller
      *
      * Recebe uma notificação, junto dos usuários/grupos que a receberão e dispara-a.
      */
-    public function dispararNotificacao(Request $request)
+    public function triggerNotification(Request $request)
     {
         try {
             $request->validate([
@@ -120,7 +120,7 @@ class NotificationController extends Controller
      *
      * Recebe o ID de uma notificação e a marca como lida.
      */
-    public function marcarComoLida(Request $request)
+    public function markAsRead(Request $request)
     {
         try {
             $request->validate([
