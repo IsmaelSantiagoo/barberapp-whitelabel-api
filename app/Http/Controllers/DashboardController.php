@@ -11,7 +11,9 @@ class DashboardController extends Controller
 
         // consultando agendas de hoje
         $todayAppointments = Appointment::whereDate('date', now()->toDateString())
-            ->with(['service','customer'])
+            ->with(['service', 'customer'])
+            ->orderByRaw("CASE WHEN status = '2' THEN 1 ELSE 0 END")
+            ->orderBy('time', 'asc')
             ->get();
 
         // retornando resposta
