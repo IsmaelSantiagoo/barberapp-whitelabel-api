@@ -14,18 +14,9 @@ class RegisterBarbershopController extends Controller
     {
         return DB::transaction(function () use ($request) {
 
-            // 1. Gerar Slug se não vier (ex: "Barbearia do Zé" -> "barbearia-do-ze")
-            $slug = $request->slug ?? Str::slug($request->company_name);
-
-            // Verifica duplicidade básica de slug gerado
-            if (Barbershop::where('slug', $slug)->exists()) {
-                $slug = $slug . '-' . rand(100, 999);
-            }
-
             // 2. Criar a Barbearia
             $barbershop = Barbershop::create([
                 'company_name' => $request->company_name,
-                'slug' => $slug,
                 'primary_color' => $request->primary_color ?? '#000000',
             ]);
 

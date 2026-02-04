@@ -97,7 +97,7 @@ class AuthController extends Controller
             'message' => 'Login realizado com sucesso!',
             'data' => [
                 'user' => $user->makeHidden('barbershop'), // Esconde a relação para não duplicar no JSON
-                'barbershop' => $user->barbershop, // Retorna os dados da barbearia (slug, cor, etc)
+                'barbershop' => $user->barbershop, // Retorna os dados da barbearia (cor, etc)
                 'access_token' => $token,
             ]
         ]);

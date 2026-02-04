@@ -10,29 +10,23 @@ class IdentifyBarbershop
 {
     public function handle(Request $request, Closure $next)
     {
-        // Tenta pegar pelo Header (útil para App Mobile/Postman)
-        $slug = $request->header('X-Barbershop-Slug');
+        // Obtém o barbershop_id do header
+        $barbershopId = $request->header('X-Barbershop-ID');
 
-        // Se não tiver header, tenta pegar pelo subdomínio (útil para Web)
-        // Lógica simples de exemplo: extrair 'loja1' de 'loja1.meusite.com'
-        if (!$slug) {
-            $host = $request->getHost();
-            $parts = explode('.', $host);
-            if (count($parts) > 2) {
-                $slug = $parts[0];
-            }
+        if (!$barbershopId) {
+            return response()->json(['message' => 'Barbearia não identificada. Header X-Barbershop-ID é obrigatório.'], 400);
         }
 
-        $barbershop = Barbershop::where('slug', $slug)->first();
+        $barbershop = Barbershop::find($barbershopId);
 
         if (!$barbershop) {
             return response()->json(['message' => 'Barbearia não encontrada.'], 404);
         }
 
-        // Salva o ID na sessão ou num Singleton para usar na Trait
+        // Salva o ID na sessão para usar na Trait
         session()->put('barbershop_id', $barbershop->id);
 
-        // Opcional: injetar o objeto barbershop na requisição para fácil acesso
+        // Injetar o objeto barbershop na requisição para fácil acesso
         $request->merge(['barbershop' => $barbershop]);
 
         return $next($request);

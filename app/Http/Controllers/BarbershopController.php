@@ -24,11 +24,20 @@ class BarbershopController extends Controller
         }
     }
 
-    // lista uma barbearia pelo slug
-    public function find($barbershop_slug)
+    // lista uma barbearia pelo ID
+    public function find($barbershop_id)
     {
         try {
-            $barbershop = Barbershop::with('businessHours')->where('slug', $barbershop_slug)->first();
+            $barbershop = Barbershop::with('businessHours')->find($barbershop_id);
+
+            if (!$barbershop) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Barbearia não encontrada.',
+                    'data' => null
+                ], 404);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Consulta realizada com sucesso.',

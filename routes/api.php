@@ -12,7 +12,7 @@ Broadcast::routes(['middleware' => ['auth:sanctum']]);
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register'])->middleware('identify.barbershop');
 Route::post('/register-barbershop', [RegisterBarbershopController::class, 'store']);
-Route::get('/barber-shops/{barbershop_slug}', [BarbershopController::class, 'find']);
+Route::get('/barber-shops/{barbershop_id}', [BarbershopController::class, 'find']);
 
 Route::middleware(['auth:sanctum', 'identify.barbershop'])->group(function () {
     // protegidas

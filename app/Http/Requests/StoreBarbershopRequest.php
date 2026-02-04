@@ -24,7 +24,6 @@ class StoreBarbershopRequest extends FormRequest
         return [
             // Dados da Barbearia
             'company_name' => 'required|string|max:255',
-            'slug'         => 'nullable|string|unique:barbershops,slug|alpha_dash',
             'primary_color' => 'nullable|hex_color',
 
             // Dados do Dono (Admin)

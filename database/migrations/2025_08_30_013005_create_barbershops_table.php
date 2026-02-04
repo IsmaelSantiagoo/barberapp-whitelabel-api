@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('barbershops', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('company_name'); // Nome da Barbearia
-            $table->string('slug')->unique(); // ex: barbearia-do-ze (usado na URL ou subdomínio)
             $table->string('domain')->nullable()->unique(); // Para domínio próprio
             $table->string('primary_color')->default('#000000'); // Customização Whitelabel
             $table->string('logo_url')->nullable();

@@ -13,7 +13,6 @@ class Barbershop extends Model
 
     protected $fillable = [
         'company_name',
-        'slug',
         'domain',
         'primary_color',
         'logo_url',
