@@ -17,6 +17,10 @@ class Barbershop extends Model
         'domain',
         'primary_color',
         'logo_url',
+        'address',
+        'phone',
+        'instagram',
+        'email'
     ];
 
     public function users()

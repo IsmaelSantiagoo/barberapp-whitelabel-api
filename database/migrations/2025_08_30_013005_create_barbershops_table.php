@@ -18,6 +18,11 @@ return new class extends Migration
             $table->string('domain')->nullable()->unique(); // Para domínio próprio
             $table->string('primary_color')->default('#000000'); // Customização Whitelabel
             $table->string('logo_url')->nullable();
+
+            $table->string('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
