@@ -34,4 +34,12 @@ class Appointment extends Model
     {
         return $this->belongsTo(Service::class, 'service_id', 'id');
     }
+
+    /**
+     * A agenda pertence a uma barbearia
+     */
+    public function barbershop(): BelongsTo
+    {
+        return $this->belongsTo(Barbershop::class, 'barbershop_id', 'id');
+    }
 }

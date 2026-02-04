@@ -136,6 +136,33 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Busca os agendamentos do cliente logado na barbearia atual
+     */
+    public function getByClient()
+    {
+        try {
+            $user = Auth::user();
+
+            $appointments = Appointment::with('service')
+                ->where('customer_id', $user->id)
+                ->orderBy('date', 'desc')
+                ->orderBy('time', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Agendamentos do cliente consultados com sucesso!',
+                'data' => $appointments
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao consultar agendamentos do cliente: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Valida se o horário está disponível segundo os business_hours
      */
     private function validateBusinessHours(Request $request)
