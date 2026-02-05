@@ -19,7 +19,7 @@ return new class extends Migration
                 ->on('barbershops')
                 ->onDelete('cascade');
 
-            $table->string('name'); // Ex: "Corte Degradê"
+            $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('duration_minutes');
             $table->boolean('active')->default(true);

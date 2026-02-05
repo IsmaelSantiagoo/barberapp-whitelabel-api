@@ -17,4 +17,9 @@ class Service extends Model
         'description',
         'active'
     ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'price' => 'decimal:2',
+    ];
 }
