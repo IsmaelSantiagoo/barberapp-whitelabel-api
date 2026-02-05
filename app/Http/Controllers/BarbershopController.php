@@ -61,6 +61,8 @@ class BarbershopController extends Controller
                 'phone',
                 'instagram',
                 'email',
+                'logo_url',
+                'primary_color'
             ]));
             return response()->json([
                 'success' => true,
