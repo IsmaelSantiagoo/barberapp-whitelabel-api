@@ -7,14 +7,29 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lista todos os serviços da barbearia com os dados da categoria
-        $services = Service::get();
+        // lista e filtra serviços
+        $services = Service::where(function ($query) use ($request) {
+
+            // filtra por active true ou false
+            if ($request->has('active')) {
+                $query->where('active', filter_var($request->query('active'), FILTER_VALIDATE_BOOLEAN));
+            }
+        });
+
         return response()->json([
             'success' => true,
             'message' => 'Serviços carregados com sucesso',
-            'data' => $services
+            'data' => $services->get()
+        ]);
+    }
+
+    public function show(Service $service)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $service
         ]);
     }
 
@@ -30,11 +45,12 @@ class ServiceController extends Controller
                 'active' => 'boolean',
             ]);
 
-            Service::create($validated);
+            $service = Service::create($validated);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Serviço cadastrado!',
+                'data' => $service
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -60,6 +76,7 @@ class ServiceController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Serviço atualizado!',
+                'data' => $service->fresh()
             ]);
         } catch (\Exception $e) {
             return response()->json([
