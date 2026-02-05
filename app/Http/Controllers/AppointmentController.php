@@ -52,7 +52,15 @@ class AppointmentController extends Controller
             }
 
             // O barbershop_id é preenchido automaticamente pela Trait no evento 'creating'
-            $appointment = Appointment::create($request->all());
+            $appointment = Appointment::create(array_merge($request->all(), [
+                'status' => $request->input('status', '0') // Pendente por padrão
+            ]));
+
+            // Carregar relacionamentos para o evento
+            $appointment->load(['customer', 'service', 'barbershop']);
+
+            // Disparar evento de agendamento realizado
+            event(new \App\Events\AppointmentScheduled($appointment));
 
             return response()->json([
                 'success' => true,

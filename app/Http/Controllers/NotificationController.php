@@ -103,7 +103,7 @@ class NotificationController extends Controller
                     'type' => $notification->type,
                     'link' => $notification->menu ? $notification->menu->route : null,
                     'sent_at' => $notification->sent_at,
-                    'read' => $notification->read_date !== null,
+                    'read' => $notification->read_at !== null,
                 ];
             })
         ;
@@ -135,7 +135,7 @@ class NotificationController extends Controller
 
             foreach ($notifications as $notification) {
                 if ($notification->user_id === $request->user()->id) {
-                    $notification->read_date = now();
+                    $notification->read_at = now();
                     $notification->save();
                 }
             }
