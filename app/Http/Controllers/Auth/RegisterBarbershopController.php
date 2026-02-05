@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBarbershopRequest;
 use App\Models\Barbershop;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class RegisterBarbershopController extends Controller
 {
@@ -29,7 +28,7 @@ class RegisterBarbershopController extends Controller
             ]);
 
             // 4. Criar dados iniciais para o cliente não começar do zero
-            $this->createDefaultCategories($barbershop);
+            $this->createDefaultServices($barbershop);
 
             // 5. Criar horários de funcionamento padrão
             $barbershop->createDefaultBusinessHours();
@@ -50,21 +49,17 @@ class RegisterBarbershopController extends Controller
     }
 
     /**
-     * Cria categorias padrão para a nova barbearia
+     * Cria serviços padrão para a nova barbearia
      */
-    private function createDefaultCategories(Barbershop $barbershop)
+    private function createDefaultServices(Barbershop $barbershop)
     {
-        // Criando a categoria
-        $category = $barbershop->categories()->create([
-            'name' => 'Cortes Clássicos',
-        ]);
 
-        // Criando o serviço dentro da categoria
-        $category->services()->create([
+        // Criando o serviço default
+        $barbershop->services()->create([
             'barbershop_id' => $barbershop->id,
             'name' => 'Corte Social',
-            'price' => 35.00,
-            'duration_minutes' => 30
+            'price' => 50.00,
+            'duration_minutes' => 45
         ]);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ServiceController extends Controller
 {
@@ -21,52 +20,68 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
-        $barbershopId = session()->get('barbershop_id');
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'duration_minutes' => 'required|integer|min:1',
-            'description' => 'nullable|string',
-            // Valida se a categoria existe E pertence à barbearia logada
-            'category_id' => [
-                'required',
-                Rule::exists('categories', 'id')->where(function ($query) use ($barbershopId) {
-                    $query->where('barbershop_id', $barbershopId);
-                }),
-            ],
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'price' => 'required|numeric|min:0',
+                'duration_minutes' => 'required|integer|min:1',
+                'description' => 'nullable|string',
+                'active' => 'boolean',
+            ]);
 
-        $service = Service::create($validated);
+            Service::create($validated);
 
-        return response()->json([
-            'message' => 'Serviço cadastrado!',
-            'data' => $service->load('category')
-        ], 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Serviço cadastrado!',
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao cadastrar o serviço: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function update(Request $request, Service $service)
     {
-        $barbershopId = session()->get('barbershop_id');
+        try {
 
-        $validated = $request->validate([
-            'name' => 'string|max:255',
-            'price' => 'numeric|min:0',
-            'duration_minutes' => 'integer|min:1',
-            'category_id' => [
-                'sometimes',
-                Rule::exists('categories', 'id')->where(fn($q) => $q->where('barbershop_id', $barbershopId)),
-            ],
-        ]);
+            $validated = $request->validate([
+                'name' => 'string|max:255',
+                'price' => 'numeric|min:0',
+                'duration_minutes' => 'integer|min:1',
+                'active' => 'boolean'
+            ]);
 
-        $service->update($validated);
+            $service->update($validated);
 
-        return response()->json(['message' => 'Serviço atualizado!', 'data' => $service]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Serviço atualizado!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizar o serviço: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroy(Service $service)
     {
-        $service->delete();
-        return response()->json(['message' => 'Serviço removido.']);
+        try {
+            $service->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Serviço removido.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao remover o serviço: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

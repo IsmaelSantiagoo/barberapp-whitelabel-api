@@ -18,11 +18,11 @@ return new class extends Migration
                 ->references('id')
                 ->on('barbershops')
                 ->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade'); // Relaciona com a categoria
 
             $table->string('name'); // Ex: "Corte Degradê"
             $table->decimal('price', 10, 2);
             $table->integer('duration_minutes');
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

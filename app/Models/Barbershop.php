@@ -32,9 +32,9 @@ class Barbershop extends Model
         return $this->hasMany(Menu::class, 'barbershop_id');
     }
 
-    public function categories()
+    public function services()
     {
-        return $this->hasMany(Category::class, 'barbershop_id');
+        return $this->hasMany(Service::class, 'barbershop_id');
     }
 
     public function businessHours()
