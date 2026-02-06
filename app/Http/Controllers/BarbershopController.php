@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barbershop;
+use Illuminate\Support\Facades\Storage;
 
 class BarbershopController extends Controller
 {
@@ -65,6 +66,20 @@ class BarbershopController extends Controller
                 'app_link',
                 'primary_color'
             ]));
+
+            // salva arquivo de logo se fornecido
+            if (request()->filled('logo_file')) {
+                $logoData = request()->input('logo_file');
+                if (is_string($logoData) && str_contains($logoData, ',')) {
+                    $logoData = explode(',', $logoData, 2)[1];
+                }
+                $logoPath = 'logos/' . $barbershop->id . '.png';
+                Storage::disk('public')->put($logoPath, base64_decode($logoData));
+                $barbershop->logo_file = $logoPath;
+                $barbershop->logo_url = app()->make('url')->to('/') . Storage::url($logoPath);
+                $barbershop->save();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Barbearia atualizada com sucesso.',

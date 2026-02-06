@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('domain')->nullable()->unique(); // Para domínio próprio
             $table->string('primary_color')->default('#000000'); // Customização Whitelabel
             $table->string('logo_url')->nullable();
+            $table->string('logo_file')->nullable();
 
             $table->string('app_link')->nullable();
             $table->string('address')->nullable();
