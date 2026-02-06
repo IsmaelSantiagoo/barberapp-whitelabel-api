@@ -62,6 +62,7 @@ class BarbershopController extends Controller
                 'instagram',
                 'email',
                 'logo_url',
+                'app_link',
                 'primary_color'
             ]));
             return response()->json([

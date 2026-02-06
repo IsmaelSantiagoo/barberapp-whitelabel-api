@@ -16,6 +16,7 @@ class Barbershop extends Model
         'domain',
         'primary_color',
         'logo_url',
+        'app_link',
         'address',
         'phone',
         'instagram',

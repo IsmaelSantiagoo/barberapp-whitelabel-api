@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('primary_color')->default('#000000'); // Customização Whitelabel
             $table->string('logo_url')->nullable();
 
+            $table->string('app_link')->nullable();
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('instagram')->nullable();
