@@ -97,12 +97,57 @@ class UserController extends Controller
                 'success' => true,
                 'message' => 'Senha alterada com sucesso.'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao alterar a senha: ' . $e->getMessage()
             ]);
+        }
+    }
+
+    // função para alterar o email do usuário
+    public function alterarEmail(Request $request, $id)
+    {
+        $rules = [
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $id],
+        ];
+
+        $validator = Validator::make($request->all(), $rules, [
+            'email.required' => 'O email é obrigatório.',
+            'email.email' => 'O email informado é inválido.',
+            'email.max' => 'O email deve ter no máximo 255 caracteres.',
+            'email.unique' => 'Este email já está em uso.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuário não encontrado.'
+                ], 404);
+            }
+
+            $user->email = $request->email;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email alterado com sucesso.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao alterar o email: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -165,7 +210,6 @@ class UserController extends Controller
                 'success' => true,
                 'message' => 'Imagem alterada com sucesso.',
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -272,8 +316,7 @@ class UserController extends Controller
             ->favorite_menus()
             ->with('parent_menu_id')
             ->get()
-            ->setHidden(['pivot'])
-        ;
+            ->setHidden(['pivot']);
 
         return response()->json([
             'success' => true,
@@ -293,8 +336,7 @@ class UserController extends Controller
 
             $result = $user
                 ->favorite_menus()
-                ->toggle($menu->id)
-            ;
+                ->toggle($menu->id);
 
             $menu->load('menu_pai');
 
@@ -310,8 +352,7 @@ class UserController extends Controller
                     'menu' => $menu,
                 ],
             ]);
-        }
-        catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao favoritar/desfavoritar o menu.',
