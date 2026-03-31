@@ -46,6 +46,7 @@ class User extends Authenticatable
         'name',
         'password',
         'email',
+        'phone',
         'profile_photo',
         'role',
         'first_access'
@@ -138,6 +139,11 @@ class User extends Authenticatable
             'first_access' => $this->first_access,
             'role' => $this->role,
         ];
+    }
+
+    public function trustedDevices()
+    {
+        return $this->hasMany(TrustedDevice::class, 'user_id');
     }
 
     public function notifications()
