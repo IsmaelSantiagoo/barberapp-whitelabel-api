@@ -143,7 +143,7 @@ class ClientAuthController extends Controller
     return response()->json([
       'success' => true,
       'data' => [
-        'user' => $user,
+        'user' => $user->makeHidden('barbershop'),
         'barbershop' => $user->barbershop,
         'access_token' => $accessToken,
         'device_token' => $deviceToken,
@@ -193,7 +193,7 @@ class ClientAuthController extends Controller
     return response()->json([
       'success' => true,
       'data' => [
-        'user' => $user,
+        'user' => $user->makeHidden('barbershop'),
         'barbershop' => $user->barbershop,
         'access_token' => $accessToken,
       ],
