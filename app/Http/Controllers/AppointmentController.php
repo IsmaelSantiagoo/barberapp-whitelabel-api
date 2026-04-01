@@ -131,6 +131,11 @@ class AppointmentController extends Controller
     {
         try {
             $appointment->update(['status' => '2']);
+
+            // Carregar relacionamentos e disparar notificação de cancelamento
+            $appointment->load(['customer', 'service', 'barbershop']);
+            event(new \App\Events\AppointmentCancelled($appointment));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agenda cancelada.'
