@@ -156,7 +156,7 @@ class UserController extends Controller
     {
         // validação básica
         $request->validate([
-            'imagem' => 'required|image|max:4096', // max 4MB
+            'image' => 'required|image|max:4096', // max 4MB
         ]);
 
         // buscar usuário
