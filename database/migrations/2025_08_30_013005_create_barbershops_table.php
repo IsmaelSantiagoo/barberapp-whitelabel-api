@@ -20,10 +20,16 @@ return new class extends Migration
             $table->string('logo_file')->nullable();
 
             $table->string('app_link')->nullable();
-            $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('instagram')->nullable();
             $table->string('email')->nullable();
+
+            $table->string('street')->nullable();
+            $table->string('address')->nullable();
+            $table->string('complement')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('zip_code')->nullable();
             $table->timestamps();
         });
     }

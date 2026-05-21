@@ -26,7 +26,7 @@ class BarbershopController extends Controller
     }
 
     // lista uma barbearia pelo ID
-    public function find($barbershop_id)
+    public function find(string $barbershop_id)
     {
         try {
             $barbershop = Barbershop::with('businessHours')->find($barbershop_id);
@@ -58,13 +58,18 @@ class BarbershopController extends Controller
         try {
             $barbershop->update(request()->only([
                 'company_name',
-                'address',
                 'phone',
                 'instagram',
                 'email',
                 'logo_url',
                 'app_link',
-                'primary_color'
+                'primary_color',
+                'address',
+                'street',
+                'complement',
+                'city',
+                'state',
+                'zip_code',
             ]));
 
             // salva arquivo de logo se fornecido

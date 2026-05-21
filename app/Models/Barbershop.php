@@ -18,10 +18,16 @@ class Barbershop extends Model
         'logo_url',
         'logo_file',
         'app_link',
-        'address',
         'phone',
         'instagram',
-        'email'
+        'email',
+        // endereço
+        'street',
+        'address',
+        'complement',
+        'city',
+        'state',
+        'zip_code',
     ];
 
     public function users()
