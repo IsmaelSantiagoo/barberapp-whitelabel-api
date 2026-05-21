@@ -32,7 +32,7 @@ class SendCancellationNotification
 
     $broadcastData = [
       'id' => \Illuminate\Support\Str::uuid()->toString(),
-      'type' => 'error',
+      'type' => 'warning',
       'title' => 'Agendamento Cancelado',
       'message' => "{$this->getFormattedCustomerName($appointment->customer->name)} cancelou o agendamento de {$appointment->service->name}",
       'appointment_id' => $appointment->id,
