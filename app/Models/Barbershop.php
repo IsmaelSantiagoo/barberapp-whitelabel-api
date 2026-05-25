@@ -19,6 +19,7 @@ class Barbershop extends Model
         'logo_file',
         'app_link',
         'phone',
+        'whatsapp_message',
         'instagram',
         'email',
         // endereço

@@ -21,6 +21,7 @@ return new class extends Migration
 
             $table->string('app_link')->nullable();
             $table->string('phone')->nullable();
+            $table->string('whatsapp_message')->nullable();
             $table->string('instagram')->nullable();
             $table->string('email')->nullable();
 

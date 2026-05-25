@@ -70,6 +70,7 @@ class BarbershopController extends Controller
                 'city',
                 'state',
                 'zip_code',
+                'whatsapp_message',
             ]));
 
             // salva arquivo de logo se fornecido
