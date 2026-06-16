@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -55,6 +58,50 @@ class DashboardController extends Controller
             'data' => $todayAppointments,
             'stats' => $stats,
             'financial_summary' => $financial_summary
+        ]);
+    }
+
+    public function getinvoicingByYear(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'year' => 'required|integer'
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dados inválidos',
+                'errors' => $validate->errors()
+            ], 400);
+        }
+
+        $year = $request->year;
+        $appointments = Appointment::with('service')->whereYear('date', $year)->get();
+
+        $invoicingByMonth = $appointments->where('status', '1')
+            ->groupBy(function ($appointment) {
+                return Carbon::parse($appointment->date)->format('n');
+            })
+            ->map(function ($monthGroup) {
+                return $monthGroup->sum(function ($appointment) {
+                    return optional($appointment->service)->price ?? 0;
+                });
+            })
+            ->toArray();
+        
+        $formattedData = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $formattedData[] = [
+                // 'M' traz a abreviação de 3 letras (ex: "Jan"). Usamos strtolower para "jan".
+                'month' => strtolower(Carbon::create()->month($m)->translatedFormat('M')),
+                'total' => $invoicingByMonth[$m] ?? 0
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Faturamento do ano consultado com sucesso.',
+            'data' => $formattedData
         ]);
     }
 }
