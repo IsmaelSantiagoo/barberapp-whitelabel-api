@@ -68,7 +68,13 @@ Rode as migrations para criar a estrutura das tabelas no banco de dados e os see
 php artisan migrate --seed
 ```
 
-#### 7. Executar os Serviços da API
+#### 7. Configurar a Evolution API (WhatsApp)
+Antes de iniciar os serviços, você deve configurar a Evolution API seguindo o guia detalhado:
+👉 **[Configuração da Evolution API (SETUP_EVOLUTION.md)](file:///c:/workspace/Unify/apps/app-barberfy/barberfy-api/SETUP_EVOLUTION.md)**
+
+Retorne a este arquivo assim que concluir a configuração da instância do WhatsApp no painel.
+
+#### 8. Executar os Serviços da API
 Para o funcionamento completo da aplicação, você precisará rodar três processos paralelos no terminal (ou utilizar um gerenciador de processos de sua preferência):
 
 *   **Servidor Web da API:**

@@ -74,6 +74,17 @@ Copie a URL que aparece na chave `"manager"` (geralmente `http://localhost:8080/
 3. Abra o WhatsApp no seu celular, vá em **Aparelhos Conectados** -> **Conectar um Aparelho** e escaneie o código exibido na tela.
 4. Pronto! A instância estará conectada e pronta para enviar mensagens.
 
+### 🚀 10. Voltar ao README.md e finalizar no Backend
+Agora que a Evolution API está rodando e conectada ao seu WhatsApp, você deve voltar ao arquivo [README.md](file:///c:/workspace/Unify/apps/app-barberfy/barberfy-api/README.md) principal para terminar a configuração.
+
+Abra o arquivo `.env` da sua API Laravel (`barberfy-api`) e preencha as variáveis correspondentes com os dados mostrados no manager:
+
+*   **`EVOLUTION_API_URL`**: A URL com a porta onde a API está rodando (normalmente `http://localhost:8080`).
+*   **`EVOLUTION_API_KEY`**: A mesma chave de autenticação que você gerou no LastPass e configurou no seu `docker.env`.
+*   **`EVOLUTION_INSTANCE`**: O nome da instância que você criou no manager (ex: `teste_api`).
+
+Depois disso, prossiga para a inicialização dos serviços do Laravel.
+
 ---
 
 ## ⚠️ Possíveis Erros e Soluções
